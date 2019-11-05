@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <string.h>
+
+void Yuv4202Nv21(unsigned char* yuv420, unsigned char* nv21, int width, int height, int pitch)
+{
+	int i, j;
+	int y_size = width * height;
+	unsigned char* y1 = yuv420;
+	unsigned char* y2 = yuv420 + width;
+	unsigned char* u = yuv420 + y_size;
+	unsigned char* v = yuv420 + y_size * 5 / 4;
+	unsigned char* y_tmp1 = nv21;
+	unsigned char* y_tmp2 = nv21 + pitch;
+	unsigned char* vu_tmp = nv21 + pitch * height;
+
+	for (j = 0; j < height / 2; j++)
+	{
+		memcpy(y_tmp1, y1, pitch);
+		memcpy(y_tmp2, y2, pitch);
+
+		for (i = 0; i < pitch / 2; i++)
+		{
+			vu_tmp[2 * i + j * pitch] = v[i + j * width / 2];
+			vu_tmp[2 * i + 1 + j * pitch] = u[i + j * width / 2];
+		}
+		
+		y1 += width * 2;
+		y2 += width * 2;
+		y_tmp1 += pitch * 2;
+		y_tmp2 += pitch * 2;
+	}
+}
+
+//yes 2019-2-20
+void Nv212Yuv420(unsigned char* image_src, unsigned char* image_dst, int image_width, int image_height)
+{
+	unsigned char* p = image_dst;
+	//memset(p, 16, image_width * image_height);
+	memcpy(p, image_src, image_width * image_height);
+	const unsigned char* pNV = image_src + image_width * image_height;
+	unsigned char* pU = p + image_width * image_height;
+	unsigned char* pV = p + image_width * image_height + ((image_width * image_height) >> 2);
+	//memset(pNV, 128, image_width * image_height * 3 / 2);
+	int i = 0;
+	for (i = 0; i < (image_width * image_height) / 2; i++)
+	{
+		if ((i % 2) == 0)
+		{
+			*pV++ = *(pNV + i);
+		}
+		else
+		{
+			*pU++ = *(pNV + i);
+		}	
+	}
+}
