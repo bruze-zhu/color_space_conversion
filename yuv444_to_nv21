@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <string.h>
+
 void Yuv444Planer2Nv21(unsigned char *pYuv, unsigned char *pNv21, int pitch, int width, int height)
 {
 	int i, j;
