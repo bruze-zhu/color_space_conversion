@@ -1,0 +1,59 @@
+void Yuv444Planer2Nv21(unsigned char *pYuv, unsigned char *pNv21, int pitch, int width, int height)
+{
+	int i, j;
+	unsigned char *pnv21_y, *pnv21_vu, *pyuv_y, *pyuv_u, *pyuv_v;
+	memset(pNv21, 0, pitch * height * 3 / 2);
+	pnv21_y = pNv21;
+	pnv21_vu = pNv21 + pitch * height;
+
+	pyuv_y = pYuv;
+	pyuv_u = pYuv + width * height;
+	pyuv_v = pYuv + width * height * 2;
+
+	for (j = 0; j < height; j += 2)
+	{
+		for (i = 0; i < pitch; i++)
+		{
+			pnv21_y[i + j * pitch] = pyuv_y[i + j * width];
+			pnv21_y[i + (j + 1) * pitch] = pyuv_y[i + (j + 1) * width];
+
+			if (j % 2 == 0 && i % 2 == 0)
+			{
+				*(pnv21_vu++) = pyuv_v[i + j * width];
+				*(pnv21_vu++) = pyuv_u[i + j * width];
+			}
+		}
+	}
+
+}
+
+void Yuv4442Nv21(unsigned char *pYuv, unsigned char *pNv21, int pitch, int width, int height)
+{
+	int i, j;
+	unsigned char *pnv21_y, *pnv21_vu, *pyuv_y, *pyuv_u, *pyuv_v;
+	memset(pNv21, 0, width * height * 3 / 2);
+	pnv21_y = pNv21;
+	pnv21_vu = pNv21 + width * height;
+
+	pyuv_y = pYuv;
+	pyuv_u = pYuv + pitch * height;
+	pyuv_v = pYuv + pitch * height * 2;
+
+	for (j = 0; j < height; j++)
+	{
+		memcpy(pNv21 + j * width, pYuv + j * pitch, width);
+	}
+
+	for (j = 0; j < height; j += 2)
+	{
+		for (i = 0; i < width; i++)
+		{
+			if (j % 2 == 0 && i % 2 == 0)
+			{
+				*(pnv21_vu++) = pyuv_v[i + j * pitch];
+				*(pnv21_vu++) = pyuv_u[i + j * pitch];
+			}
+		}
+	}
+
+}
